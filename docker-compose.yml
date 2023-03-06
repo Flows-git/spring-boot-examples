@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  spring_application:
+    build:
+      context: .
+    ports:
+      - 8080:8080
+      - 5005:5005
+    volumes:
+      - ./:/app
+    
