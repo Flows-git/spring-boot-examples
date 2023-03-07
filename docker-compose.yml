@@ -16,6 +16,11 @@ services:
       - 5005:5005
     volumes:
       - ./:/app
+    environment:
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_URL=http://keycloak:8100/auth
     depends_on:
       - keycloak
     networks:
