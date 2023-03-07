@@ -1,7 +1,14 @@
 version: '3'
 
+networks:
+  example_app:
+    driver: bridge
+
+volumes:
+  keycloak_data:
 services:
   spring_application:
+    container_name: expamle-app-spring-application
     build:
       context: .
     ports:
@@ -9,4 +16,44 @@ services:
       - 5005:5005
     volumes:
       - ./:/app
-    
+    depends_on:
+      - keycloak
+    networks:
+      - example_app
+# Keycloak
+  keycloak:
+    container_name: expamle-app-keycloak
+    image: jboss/keycloak:16.1.1
+    restart: unless-stopped
+    command: ["-Djboss.http.port=8100"]
+    ports:
+      - "8100:8100"
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 3
+    networks:
+      - example_app
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: mysql_keycloak
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: My_Us3r_Passw0rd
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+    depends_on:
+      - mysql_keycloak
+  mysql_keycloak:
+    container_name: expamle-app-mysql-keycloak
+    image: mysql:8.0
+    restart: unless-stopped
+    networks:
+      - example_app
+    volumes:
+      - keycloak_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Keycloak_Root_Passw0rd
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: My_Us3r_Passw0rd
